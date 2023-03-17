@@ -5,13 +5,23 @@ import Axios from "axios";
 
 function Home() {
     const [buildings, setBuildings] = useState([]);
+    const [bicycleStops, setBicycleStops] = useState([]);
+    const [startBuilding, setStartBuilding] = useState();
+    const [endBuilding, setEndBuilding] = useState();
+    const [travelMethod, setTravelMethod] = useState("");
 
     const { register, handleSubmit, formState: { errors } } = useForm();
 
-
+    //Võta andmebaasist hooned
     const getBuildings = () => {
         Axios.get("http://localhost:3001/buildings").then((response) => {
         setBuildings(response.data);
+        });
+    };
+    //Vüta andmebaasist rattaringluse punktid
+    const getBicycleStops = () => {
+        Axios.get("http://localhost:3001/bicyclestops").then((response) => {
+        setBicycleStops(response.data);
         });
     };
 
@@ -19,8 +29,62 @@ function Home() {
         getBuildings();
     },[])
 
+    useEffect(() => {
+        //Kontroll, et lehe algsel laadimisel ei hakkaks seda osa tegema
+        if (startBuilding) {            
+            //Lähima rattaringluse peatuse kaugus võrdlemiseks
+            let closestDistToStart = Number.MAX_VALUE;
+            //Lähim rattaringluse peatus
+            let startStop
+    
+            let closestDistToEnd = Number.MAX_VALUE;
+            let endStop
+            bicycleStops.forEach(stop => {
+                //valem kauguse arvutamiseks √[(x2 − x1)2 + (y2 − y1)2]
+                //Arvuta rattaringluse peatuse kaugus algus ja lõpppunktist
+                let distToStart = Math.sqrt((startBuilding[0].x_coordinate - stop.x_coordinate)**2 + (startBuilding[0].y_coordinate - stop.y_coordinate)**2);
+                let distToEnd = Math.sqrt((endBuilding[0].x_coordinate - stop.x_coordinate)**2 + (endBuilding[0].y_coordinate - stop.y_coordinate)**2);
+
+                //Võrdle peatuse kaugust ja kui on lähemal uuenda peatus
+                if (distToStart < closestDistToStart) {
+                    closestDistToStart = distToStart;
+                    startStop = stop
+                };
+    
+                if (distToEnd < closestDistToEnd) {
+                    closestDistToEnd = distToEnd;
+                    endStop = stop
+                };
+            });
+            if (startStop && endStop) {
+                console.log(`https://www.google.com/maps/dir/?api=1&origin=${startBuilding[0].address}&destination=${endBuilding[0].address}&&travelmode=${travelMethod}&
+                waypoints=${startStop.x_coordinate}%2C${startStop.y_coordinate}&${endStop.x_coordinate}%2C${endStop.x_coordinate}`)
+                window.open(`https://www.google.com/maps/dir/?api=1&origin=${startBuilding[0].address}&destination=${endBuilding[0].address}&&travelmode=${travelMethod}&
+                waypoints=${startStop.x_coordinate}%2C${startStop.y_coordinate}${endStop.x_coordinate}%2C${endStop.x_coordinate}`, '_blank');
+            }
+        }
+    },[bicycleStops, startBuilding, endBuilding, travelMethod])
+
     const onSubmit = data => {
-        window.open(`https://www.google.com/maps/dir/?api=1&origin=${data.startLocation}&destination=${data.endLocation}&&travelmode=${data.method}`, '_blank');
+        //Kui transpordimeetod on driving2 ehk jalgratas, kasutades rattaringluse punkte
+        if (data.method === "driving2") {
+            
+            getBicycleStops();
+
+            //Leia valitud hoonete koordinaadid ja salvesta need
+            const startLoc = buildings.filter(function (elem) {
+                return elem.address === data.startLocation;
+            });
+            const endLoc = buildings.filter(function (elem) {
+                return elem.address === data.endLocation;
+            });
+
+            setStartBuilding(startLoc);
+            setEndBuilding(endLoc);
+            setTravelMethod("driving");
+        } else {
+            window.open(`https://www.google.com/maps/dir/?api=1&origin=${data.startLocation}&destination=${data.endLocation}&&travelmode=${data.method}`, '_blank');
+        }
     };
         
     return (
@@ -71,6 +135,9 @@ function Home() {
                         <option value="">Vali liikumise meetod</option>
                         <option value="walking">Kõndimine</option>
                         <option value="transit">Buss</option>
+                        <option value="driving">Auto</option>
+                        <option value="driving">Jalgratas (enda ratas)</option>
+                        <option value="driving2">Jalgratas (rattaringlus)</option>
                     </select>
                     {errors.method && <span>{errors.method.message}</span>}
                     </div>
