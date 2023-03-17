@@ -25,6 +25,16 @@ app.get("/buildings", (req, res) => {
     });
 });
 
+app.get("/bicyclestops", (req, res) => {
+    db.query("SELECT * FROM bicycleStops", (err, result) => {
+        if (err) {
+            console.log(err);
+        } else {
+            res.send(result);
+        }
+    });
+});
+
 const link = "https://gis.tartulv.ee/arcgis/rest/services/Linnatransport/LI_rattaringluse_parklad_avaandmed/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson";
 
 const getBicycleStops = () => {
