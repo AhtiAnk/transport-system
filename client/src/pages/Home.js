@@ -18,7 +18,7 @@ function Home() {
         setBuildings(response.data);
         });
     };
-    //Vüta andmebaasist rattaringluse punktid
+    //Võta andmebaasist rattaringluse punktid
     const getBicycleStops = () => {
         Axios.get("http://localhost:3001/bicyclestops").then((response) => {
         setBicycleStops(response.data);
@@ -57,10 +57,7 @@ function Home() {
                 };
             });
             if (startStop && endStop) {
-                console.log(`https://www.google.com/maps/dir/?api=1&origin=${startBuilding[0].address}&destination=${endBuilding[0].address}&&travelmode=${travelMethod}&
-                waypoints=${startStop.x_coordinate}%2C${startStop.y_coordinate}&${endStop.x_coordinate}%2C${endStop.x_coordinate}`)
-                window.open(`https://www.google.com/maps/dir/?api=1&origin=${startBuilding[0].address}&destination=${endBuilding[0].address}&&travelmode=${travelMethod}&
-                waypoints=${startStop.x_coordinate}%2C${startStop.y_coordinate}${endStop.x_coordinate}%2C${endStop.x_coordinate}`, '_blank');
+                window.open(`https://www.google.com/maps/dir/?api=1&origin=${startBuilding[0].address}&destination=${endBuilding[0].address}&&travelmode=${travelMethod}&waypoints=${startStop.y_coordinate}%2C${startStop.x_coordinate}%7c${endStop.y_coordinate}%2C${endStop.x_coordinate}`, '_blank');
             }
         }
     },[bicycleStops, startBuilding, endBuilding, travelMethod])
