@@ -85,66 +85,73 @@ function Home() {
     };
         
     return (
-        <div className="container py-5">
+        <>
+        <div className='bg d-flex'>
+            <div className="container align-self-center">
 
-            <form onSubmit={handleSubmit(onSubmit)}>
-                <div className="row justify-content-md-center"> 
-                    <div className="col-md-4">
-                        <select className="form-select"
-                        {...register("startLocation", { required: "Palun vali alguspunkt" })}
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    <div className="row justify-content-md-center"> 
+                        <div className="col-md-4">
+                            <select className="form-select border border-5"
+                            {...register("startLocation", { required: "Palun vali alguspunkt" })}
+                            >
+                                <option key="" value="">Vali alguspunkt</option>
+
+                                {buildings.map((val, key) => {
+                                return <option key={val.id} value={val.address}>{val.name} | {val.address}</option>
+                                })}
+
+                            </select>
+                            {errors.startLocation && <span>{errors.startLocation.message}</span>}
+                        </div>
+                    </div>
+
+                    <br/>
+
+                    <div className="row justify-content-md-center"> 
+                        <div className="col-md-4">
+                            <select className="form-select border border-5"
+                            {...register("endLocation", { required: "Palun vali lõpppunkt" })}
+                            >
+                                <option value="">Vali lõppunkt</option>
+
+                                {buildings.map((val, key) => {
+                                return <option key={val.id} value={val.address}>{val.name} | {val.address}</option>
+                                })}
+                                
+                            </select>
+                            {errors.endLocation && <span>{errors.endLocation.message}</span>}
+                        </div>
+                    </div>
+
+                    <br/>
+                    
+                    <div className="row justify-content-md-center"> 
+                        <div className="col-md-4">
+                        <select className="form-select border border-5"
+                        {...register("method", { required: "Palun vali liikumismeetod" })}
                         >
-                            <option key="" value="">Vali alguspunkt</option>
-
-                            {buildings.map((val, key) => {
-                            return <option key={val.id} value={val.address}>{val.name} | {val.address}</option>
-                            })}
-
+                            <option value="">Vali liikumise meetod</option>
+                            <option value="walking">Kõndimine</option>
+                            <option value="transit">Buss</option>
+                            <option value="driving">Auto</option>
+                            <option value="driving">Jalgratas (enda ratas)</option>
+                            <option value="driving2">Jalgratas (rattaringlus)</option>
                         </select>
-                        {errors.startLocation && <span>{errors.startLocation.message}</span>}
+                        {errors.method && <span>{errors.method.message}</span>}
+                        </div>
                     </div>
-                </div>
-
-                <br/>
-
-                <div className="row justify-content-md-center"> 
-                    <div className="col-md-4">
-                        <select className="form-select"
-                        {...register("endLocation", { required: "Palun vali lõpppunkt" })}
-                        >
-                            <option value="">Vali lõppunkt</option>
-
-                            {buildings.map((val, key) => {
-                            return <option key={val.id} value={val.address}>{val.name} | {val.address}</option>
-                            })}
-                            
-                        </select>
-                        {errors.endLocation && <span>{errors.endLocation.message}</span>}
+                    
+                    <div className="d-grid col-md-2 mx-auto">
+                        <input type="submit" className="btn btn-primary my-3" value="Näita marsruuti"/>
                     </div>
-                </div>
-
-                <br/>
-                
-                <div className="row justify-content-md-center"> 
-                    <div className="col-md-4">
-                    <select className="form-select"
-                    {...register("method", { required: "Palun vali liikumismeetod" })}
-                    >
-                        <option value="">Vali liikumise meetod</option>
-                        <option value="walking">Kõndimine</option>
-                        <option value="transit">Buss</option>
-                        <option value="driving">Auto</option>
-                        <option value="driving">Jalgratas (enda ratas)</option>
-                        <option value="driving2">Jalgratas (rattaringlus)</option>
-                    </select>
-                    {errors.method && <span>{errors.method.message}</span>}
-                    </div>
-                </div>
-                
-                <div className="d-grid col-md-2 mx-auto">
-                    <input type="submit" className="btn btn-primary my-3" value="Näita marsruuti"/>
-                </div>
-            </form>        
+                </form>        
+            </div>
+            <div className='position-absolute bottom-0 fs-6 fw-light'>
+                <a href="https://www.freepik.com/free-vector/white-gray-geometric-pattern-background-vector_18240979.htm#query=website%20background%20pattern&position=45&from_view=keyword&track=robertav1_2_sidr">Image by rawpixel.com</a> on Freepik
+            </div>
         </div>
+        </>
   )
 }
 

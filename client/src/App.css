@@ -1,3 +1,9 @@
 .App {
   text-align: center;
 }
+
+.bg {
+  background-image: url("./v748-toon-103.jpg");
+  background-size: cover;
+  height: 100vh;
+}

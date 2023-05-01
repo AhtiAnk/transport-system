@@ -2,6 +2,7 @@ const express = require("express");
 const mysql = require("mysql");
 const cors = require("cors");
 const axios = require("axios");
+const bcrypt = require('bcrypt');
 
 const app = express();
 
@@ -23,6 +24,31 @@ app.get("/buildings", (req, res) => {
             res.send(result);
         }
     });
+});
+
+app.post("/users", (req, res, ) => {
+    try {
+        const h = bcrypt.hash("testtest", 10)
+        console.log(h)
+    
+        db.query("SELECT * FROM buildings WHERE email = ? AND password = ?", [req.loginEmail, req.loginPassword], (err, result) => {
+            if (err) {
+                //req.setEncoding({err: err});
+            } else {
+                res.send(result)
+                const correctPass = bcrypt.compare(enteredPassword, result.password);
+                if (result.length > 0 && correctPass) {
+                    res.send(result);
+                }
+                else {
+                    res.send({message: "Vale e-mail või parool"})
+                }
+            }
+        });
+
+    } catch(e) {
+        console.log(e)
+    } 
 });
 
 app.get("/bicyclestops", (req, res) => {
