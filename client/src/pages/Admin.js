@@ -5,7 +5,7 @@ import Axios from "axios";
 import ReadRow from '../components/ReadRow';
 import EditRow from '../components/EditRow';
 
-function Admin() {
+function Admin({loginStatus}) {
     const [buildings, setBuildings] = useState([]);
     const [editRowId, setEditRowId] = useState(null);
     const [editBuildingFormData, setEditBuildingFormData] = useState({

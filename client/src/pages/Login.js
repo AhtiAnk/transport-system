@@ -2,10 +2,9 @@ import React, { useState } from 'react'
 import { useForm } from "react-hook-form";
 import Axios from "axios";
 
-function Login() {
-    const [email, setEmail] = useState();
-    const [password, setPassword] = useState();
-    const [loginStatus, setLogginStatus] = useState(false);
+function Login({loginStatus, setLoginStatus}) {
+    const [loginFailed, setLoginFailed] = useState(false);
+    const [loginFailMessage, setLoginFailMessage] = useState("");
     const { register, handleSubmit, formState: { errors } } = useForm();
 
     const onSubmit = data => {
@@ -21,10 +20,17 @@ function Login() {
             }
         }).then((response) => {
             if(response.data.message){
-                setLogginStatus(response.data.message);
+                //Logimine ebõnnestus
+                setLoginFailed(true);
+                setLoginFailMessage(response.data.message);
             }
             else {
-                setLogginStatus("Logimine õnnestus")
+                //Logimine õnnestus
+                setLoginStatus(true);
+                setLoginFailed(false);
+
+                sessionStorage.setItem("isLoggedIn",'1');
+                window.location.assign("/admin")
             }
         });
     };
@@ -51,6 +57,9 @@ function Login() {
                             </div>
                             <div className="d-grid col-md-3 mx-auto">
                                 <button type="submit" className="btn btn-primary text-nowrap">Logi sisse</button>
+                            </div>
+                            <div>
+                                {loginFailed && <p className='text-danger'>{loginFailMessage}</p>}
                             </div>    
                         </div>
                     </div>        

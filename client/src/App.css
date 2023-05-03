@@ -7,3 +7,7 @@
   background-size: cover;
   height: 100vh;
 }
+
+.navLink:hover {
+  background-color: #807b7c;
+}

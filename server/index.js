@@ -28,21 +28,24 @@ app.get("/buildings", (req, res) => {
 
 app.post("/users", (req, res) => {
     try {
-        const h = bcrypt.hash("testtest", 10)
-        console.log(h)
+
+        const saltRounds = 12;
     
-        db.query("SELECT * FROM buildings WHERE email = ? AND password = ?", [req.loginEmail, req.loginPassword], (err, result) => {
+        db.query("SELECT * FROM users WHERE email = ?", [req.body.loginEmail], (err, result) => {
             if (err) {
-                //req.setEncoding({err: err});
+                req.send({err: err});
             } else {
-                res.send(result)
-                const correctPass = bcrypt.compare(enteredPassword, result.password);
-                if (result.length > 0 && correctPass) {
-                    res.send(result);
-                }
-                else {
-                    res.send({message: "Vale e-mail või parool"})
-                }
+                
+                bcrypt.compare(req.body.loginPassword, result[0].password).then(function(re) {
+                    console.log(re)
+                    if (result.length > 0 && re) {
+                        res.send(result);
+                    }
+                    else {
+                        res.send({message: "Vale e-mail või parool"})
+                    }
+                });
+
             }
         });
 
