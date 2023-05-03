@@ -2,13 +2,22 @@ import React from 'react'
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import Axios from "axios";
+import ReadRow from '../components/ReadRow';
+import EditRow from '../components/EditRow';
 
 function Admin() {
     const [buildings, setBuildings] = useState([]);
+    const [editRowId, setEditRowId] = useState(null);
+    const [editBuildingFormData, setEditBuildingFormData] = useState({
+        name: "",
+        address: "",
+        x_coordinate: "",
+        y_coordinate: ""
+    });
 
     const { register, handleSubmit, formState: { errors } } = useForm();
 
-    //Võta andmebaasist hooned
+    //Funktsioon andmebaasist hoonete võtmiseks hooned
     const getBuildings = () => {
         Axios.get("http://localhost:3001/buildings").then((response) => {
         setBuildings(response.data);
@@ -19,47 +28,146 @@ function Admin() {
         getBuildings();
     },[])
 
+    //Uue hoone lisamine
     const onSubmit = data => {
+        Axios.post("http://localhost:3001/addBuilding", {
+            name: data.name,
+            address: data.address,
+            x_coordinate: data.x_coordinate,
+            y_coordinate: data.y_coordinate
+          })
+          .then(function (response) {
+            console.log(response);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+        window.location.reload();  
+    };
+
+    const editBuildingFormSubmit = (e) => {
+        e.preventDefault();
+
+        const editedBuilding = {
+            id: editRowId,
+            name: editBuildingFormData.name,
+            address: editBuildingFormData.address,
+            x_coordinate: editBuildingFormData.x_coordinate,
+            y_coordinate: editBuildingFormData.y_coordinate
+        }
+
+        const newBuildings = [...buildings];
+
+        const index = buildings.findIndex((building) => building.id === editRowId);
+
+        newBuildings[index] = editedBuilding;
+
+        Axios.post("http://localhost:3001/editBuilding", {
+            id: editRowId,
+            name: editedBuilding.name,
+            address: editedBuilding.address,
+            x_coordinate: editedBuilding.x_coordinate,
+            y_coordinate: editedBuilding.y_coordinate
+          })
+          .then(function (response) {
+            console.log(response);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+
+        setBuildings(newBuildings);
+        setEditRowId(null);
+    }
+
+    const editBuildingFormChange = (e) => {
+        e.preventDefault();
+
+        const fieldName = e.target.getAttribute("name");
+        const fieldValue = e.target.value;
+
+        const newFormData = {...editBuildingFormData};
+        newFormData[fieldName] = fieldValue;
+
+        setEditBuildingFormData(newFormData);
+    };
+
+    const handleEditButtonClick = (e, building) => {
+        e.preventDefault();
+        setEditRowId(building.id)
+
+        const formData = {
+            name: building.name,
+            address: building.address,
+            x_coordinate: building.x_coordinate,
+            y_coordinate: building.y_coordinate
+        };
+
+        setEditBuildingFormData(formData);
+    };
+
+    const handleCancelButtonClick = () => {
+        setEditRowId(null);
+    };
+
+    const handleDeleteButtonClick = (e, buildingId) => {
+        const newBuildings = [...buildings]
+        const index = buildings.findIndex((building) => building.id === buildingId);
+
+        newBuildings.splice(index, 1);
+
+        setBuildings(newBuildings);
+
+        Axios.post("http://localhost:3001/deleteBuilding", {
+            id: buildingId,
+          })
+          .then(function (response) {
+            console.log(response);
+          })
+          .catch(function (error) {
+            console.log(error);
+        });
     };
         
     return (
         <div className="container py-5">
-{/* Uue hoone lisamine */}
+{/* Uue hoone lisamise vorm */}
             <div className="container shadow p-3 my-4">
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="row justify-content-md-center"> 
                     <div className="col-md-4">
                         <div className="mb-3">
-                            <label htmlFor="nimi" className="form-label">Hoone nimi</label>
-                            <input type="text" className="form-control" id="nimi" aria-describedby="nimiHelp"
-                            {...register("nimi", { required: "Palun sisesta nimi" })}
+                            <label htmlFor="name" className="form-label">Hoone nimi</label>
+                            <input type="text" className="form-control" id="name"
+                            {...register("name", { required: "Palun sisesta nimi" })}
                             />
-                        {errors.nimi && <span>{errors.nimi.message}</span>}
+                        {errors.name && <span>{errors.name.message}</span>}
                         </div>
 
                         <div className="mb-3">
-                            <label htmlFor="aadress" className="form-label">Aadress</label>
-                            <input type="text" className="form-control" id="aadress" 
-                            {...register("aadress", { required: "Palun sisesta aadress" })}
+                            <label htmlFor="address" className="form-label">Aadress</label>
+                            <input type="text" className="form-control" id="address" 
+                            {...register("address", { required: "Palun sisesta address" })}
                             />
-                        {errors.aadress && <span>{errors.aadress.message}</span>}
+                        {errors.address && <span>{errors.address.message}</span>}
                         </div>
 
                         <div className="mb-3">
-                            <label htmlFor="x_coord" className="form-label">Laiuskraad</label>
-                            <input type="text" className="form-control" id="x_coord" 
-                            {...register("x_coord", { required: "Palun sisesta laiuskraad" })}
+                            <label htmlFor="x_coordinate" className="form-label">Pikkuskraad</label>
+                            <input type="text" className="form-control" id="x_coordinate" 
+                            {...register("x_coordinate", { required: "Palun sisesta pikkuskraad" })}
                             />
-                        {errors.x_coord && <span>{errors.x_coord.message}</span>}
+                        {errors.x_coordinate && <span>{errors.x_coordinate.message}</span>}
                         </div>
 
                         <div className="mb-3">
-                            <label htmlFor="y_coord" className="form-label">Pikkuskraad</label>
-                            <input type="text" className="form-control" id="y_coord" 
-                            {...register("y_coord", { required: "Palun sisesta y_coord" })}
+                            <label htmlFor="y_coordinate" className="form-label">Laiuskraad</label>
+                            <input type="text" className="form-control" id="y_coordinate" 
+                            {...register("y_coordinate", { required: "Palun sisesta laiuskraad" })}
                             />
-                        {errors.y_coord && <span>{errors.y_coord.message}</span>}
+                        {errors.y_coordinate && <span>{errors.y_coordinate.message}</span>}
                         </div>
+
 
                         <div className="d-grid col-md-3 mx-auto">
                             <button type="submit" className="btn btn-primary text-nowrap">Lisa Hoone</button>
@@ -67,35 +175,41 @@ function Admin() {
                     </div>
                 </div>        
             </form>
-{/* Tabel */}
+{/* Hoonete tabel */}
             </div>
-            <table class="table my-5">
-                <thead class="thead-light">
-                    <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Nimi</th>
-                    <th scope="col">Aadress</th>
-                    <th scope="col">Laiuskraad</th>
-                    <th scope="col">Pikkuskraad</th>
-                    <th scope="col">Operatsioonid</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {buildings.map((val, key) => {
-                        return <tr>
-                                    <th scope="row">{val.id}</th>
-                                    <td>{val.name}</td>
-                                    <td>{val.address}</td>
-                                    <td>{val.x_coordinate}</td>
-                                    <td>{val.y_coordinate}</td>
-                                    <td>
-                                        <button type="button" class="btn btn-primary mx-1">Muuda</button>
-                                        <button type="button" class="btn btn-danger">Kustuta</button>
-                                    </td>
-                                </tr>
-                        })}       
-                </tbody>
-                </table>
+            <form onSubmit={editBuildingFormSubmit}>
+                <table className="table my-5">
+                    <thead className="thead-light">
+                        <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Nimi</th>
+                        <th scope="col">Aadress</th>
+                        <th scope="col">Pikkuskraad</th>
+                        <th scope="col">Laiuskraad</th>
+                        <th scope="col">Operatsioonid</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {buildings.map((building) => {
+                            return <>
+                                {editRowId === building.id ? 
+                                <EditRow building={building} 
+                                    editBuildingFormData={editBuildingFormData}
+                                    editBuildingFormChange={editBuildingFormChange}
+                                    handleCancelButtonClick={handleCancelButtonClick}
+                                /> 
+                                : 
+                                <ReadRow building={building}
+                                    handleEditButtonClick={handleEditButtonClick}
+                                    handleDeleteButtonClick={handleDeleteButtonClick}
+                                />}
+                                
+                                
+                            </>
+                            })}       
+                    </tbody>
+                    </table>
+                </form>
         </div>
   )
 }

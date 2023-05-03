@@ -18,6 +18,7 @@ function Home() {
         setBuildings(response.data);
         });
     };
+    
     //Võta andmebaasist rattaringluse punktid
     const getBicycleStops = () => {
         Axios.get("http://localhost:3001/bicyclestops").then((response) => {

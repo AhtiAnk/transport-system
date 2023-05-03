@@ -26,7 +26,7 @@ app.get("/buildings", (req, res) => {
     });
 });
 
-app.post("/users", (req, res, ) => {
+app.post("/users", (req, res) => {
     try {
         const h = bcrypt.hash("testtest", 10)
         console.log(h)
@@ -61,6 +61,55 @@ app.get("/bicyclestops", (req, res) => {
     });
 });
 
+//Uue hoone lisamine
+app.post("/addBuilding", (req, res) => {
+    try {
+        db.query(`INSERT INTO buildings (name, address, x_coordinate, y_coordinate) 
+                    VALUES ('${req.body.name}', '${req.body.address}', ${req.body.x_coordinate}, ${req.body.y_coordinate})`, (err, result) => {
+            if (err) {
+                console.log(err);
+            }
+        });
+
+    } catch(e) {
+        console.log(e)
+    } 
+});
+
+//Hoone muutmine
+app.post("/editBuilding", (req, res) => {
+    try {
+        db.query(`UPDATE buildings SET name='${req.body.name}',
+                                        address='${req.body.address}', 
+                                        x_coordinate=${req.body.x_coordinate}, 
+                                        y_coordinate=${req.body.y_coordinate} 
+                                        WHERE id=${req.body.id}`,
+                                        (err, result) => {
+            if (err) {
+                console.log(err);
+            }
+        });
+
+    } catch(e) {
+        console.log(e)
+    } 
+});
+
+//Hoone kustutamine
+app.post("/deleteBuilding", (req, res) => {
+    try {
+        db.query(`DELETE FROM buildings WHERE id= ${req.body.id} `, (err, result) => {
+            if (err) {
+                console.log(err);
+            }
+        });
+
+    } catch(e) {
+        console.log(e)
+    } 
+});
+
+//Link rattaringluse parklate andmete saamiseks
 const link = "https://gis.tartulv.ee/arcgis/rest/services/Linnatransport/LI_rattaringluse_parklad_avaandmed/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson";
 
 const getBicycleStops = () => {
