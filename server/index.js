@@ -15,7 +15,7 @@ const db = mysql.createConnection({
     password: "",
     database: "transport-system",
 });
-
+//Võta Andmebaasist hooned
 app.get("/buildings", (req, res) => {
     db.query("SELECT * FROM buildings", (err, result) => {
         if (err) {
@@ -26,16 +26,15 @@ app.get("/buildings", (req, res) => {
     });
 });
 
+//Kasutaja parooli kontroll
 app.post("/users", (req, res) => {
     try {
-
-        const saltRounds = 12;
-    
+        //Leia andmebaasist kasutaja e-maili põhjal
         db.query("SELECT * FROM users WHERE email = ?", [req.body.loginEmail], (err, result) => {
             if (err) {
                 req.send({err: err});
             } else {
-                
+                //Võrdle paroole
                 bcrypt.compare(req.body.loginPassword, result[0].password).then(function(re) {
                     console.log(re)
                     if (result.length > 0 && re) {
@@ -53,7 +52,7 @@ app.post("/users", (req, res) => {
         console.log(e)
     } 
 });
-
+//Võta andmebaasist jalrattapeatused
 app.get("/bicyclestops", (req, res) => {
     db.query("SELECT * FROM bicycleStops", (err, result) => {
         if (err) {

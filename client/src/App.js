@@ -9,6 +9,7 @@ function App() {
   const [loginStatus, setLoginStatus] = useState(false);
 
   useEffect(()=>{
+    //Kontroll, kas kasutaja on sisse logitud
     const sessionstorageGetInformation=sessionStorage.getItem('isLoggedIn')
      if(sessionstorageGetInformation === '1'){
        setLoginStatus(true)

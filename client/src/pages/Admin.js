@@ -91,7 +91,7 @@ function Admin({loginStatus}) {
 
         setEditBuildingFormData(newFormData);
     };
-
+    //"Muuda nupu vajutus"
     const handleEditButtonClick = (e, building) => {
         e.preventDefault();
         setEditRowId(building.id)
@@ -105,11 +105,11 @@ function Admin({loginStatus}) {
 
         setEditBuildingFormData(formData);
     };
-
+    //"Katkesta nupu vajutus"
     const handleCancelButtonClick = () => {
         setEditRowId(null);
     };
-
+    //"Kustuta" nupu vajutus
     const handleDeleteButtonClick = (e, buildingId) => {
         const newBuildings = [...buildings]
         const index = buildings.findIndex((building) => building.id === buildingId);
